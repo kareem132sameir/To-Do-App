@@ -11,7 +11,7 @@ router.get('/',getUsers)
 
 router.get('/:id',getOneUser);
 
-router.post('/',signUpValidation,signUp);
+router.post('/signup',signUpValidation,signUp);
 
 router.post('/login',loginValidation,login);
 

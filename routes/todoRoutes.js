@@ -6,18 +6,33 @@ const jwt=require('jsonwebtoken');
 const {verfiy_token} = require('../controllers/verify_token');
 
 
-router.get('/',verfiy_token,async (req,res,next)=>{
-    const todos=await Todo.find();
-    if(!todos) return next(new AppError('todo lists not found',404));
-    res.send({todos});
+router.get('/',async (req,res,next)=>{
+    try
+    {
+        const todos=await Todo.find({userID:req.id});
+        if(todos.length==0) return next(new AppError('todo lists is empty',404));
+        res.send({todos});
+    }
+    catch(error)
+    {
+        return next(error);
+    }
 })
 
 router.get('/:id',async (req,res,next)=>{
     try
     {
+        const userID=req.id;
         const id=req.params.id;
         const todo=await Todo.findById(id);
-        res.send(todo);
+        if(todo.userID==userID)
+        {
+            res.send(todo);
+        }
+        else
+        {
+            res.send('you do not have access to these to-dos');
+        }
     }
     catch
     {
@@ -25,16 +40,21 @@ router.get('/:id',async (req,res,next)=>{
     }
 })
  
-router.post('/',verfiy_token,async (req,res,next)=>{
-    const { title,status }=req.body;
-    console.log(title,status);
-    if(!title || !status) return next(new AppError('please to do list title or status not entered',404))
-    const date_Added=new Date();
-    const todo=new Todo({title,status,date_Added,user:req.user.id});
-    await todo.save();
-    // const user=req.user;
-    const todos=await Todo.find({user:req.user.id});
-    res.send(todos);
+router.post('/',async (req,res,next)=>{
+    try
+    {
+        const { title,status }=req.body;
+        if(!title || !status) return next(new AppError('to do list title or status not entered',404))
+        const date_Added=new Date();
+        const todo=new Todo({title,status,date_Added,userID:req.id});
+        await todo.save();
+        const todos=await Todo.find({userID:req.id});
+        res.send(todos);
+    }
+    catch(error)
+    {
+        return next(error)
+    }
 })
  
 router.post('/login',verfiy_token,async (req,res,next)=>

@@ -11,7 +11,7 @@ const todoSchema= new Schema({
         required:true,
         enum:["done","wip","to-do"]
     },
-    user:{
+    userID:{
         type:Schema.Types.ObjectId,
         ref:'User'
     },

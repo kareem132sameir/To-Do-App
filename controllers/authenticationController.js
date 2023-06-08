@@ -9,7 +9,7 @@ const signUp=async (req, res, next) =>
 {
     const { name, password } = req.body;
 
-    if (!name || !password) return next(new AppError('Invalid email or password', 404));
+    if (!name || !password) return next(new AppError('please enter the required info.', 404));
 
     let user =await User.findOne({name});
 
@@ -42,10 +42,16 @@ const login=async (req, res, next) => {
   };
 
 const getUsers=async (req,res,next)=>{
-    // const users=await User.find();
-    const users = await User.find().select('-password');
-    if(!users) return next(new AppError('user lists not found',404));
-    res.send(users);
+    try
+    {
+        const users = await User.find().select('-password');
+        if(users.length==0) return next(new AppError('user lists not found',404));
+        res.send(users);
+    }
+    catch(error)
+    {
+        return next(error)
+    }
 };
 
 const getOneUser=async (req,res,next)=>{
