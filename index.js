@@ -11,7 +11,6 @@ require('dotenv').config()
 const port=process.env.PORT
 
 app.use(express.json());
-
 app.use(express.urlencoded());
 
 app.use('/todos',verfiy_token,todoRoutes);
